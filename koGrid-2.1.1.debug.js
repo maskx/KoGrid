@@ -2,7 +2,7 @@
 * koGrid JavaScript Library
 * Authors: https://github.com/ericmbarnard/koGrid/blob/master/README.md
 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
-* Compiled At: 01/11/2013 15:58:36
+* Compiled At: 04/15/2014 11:00:41
 ***********************************************/
 
 (function (window) {
@@ -229,10 +229,20 @@ window.kg.defaultHeaderCellTemplate = function(){ return '<div data-bind="style:
 * FILE: ..\src\bindingHandlers\ko-grid.js
 ***********************************************/
 ko.bindingHandlers['koGrid'] = (function () {
+    var getRootUnvisible = function (elem) {
+        if (elem.parent().is(':visible'))
+            return elem;
+        return getRootUnvisible(elem.parent());
+    }
     return {
         'init': function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
             var options = valueAccessor();
             var elem = $(element);
+            //if ele is unvisible, kogrid cannot get width correctly, so we force show this
+            if (!elem.is(':visible'))
+            {
+                getRootUnvisible(elem).show();
+            }
             options.gridDim = new window.kg.Dimension({ outerHeight: ko.observable(elem.height()), outerWidth: ko.observable(elem.width()) });
             var grid = new window.kg.Grid(options);
             var gridElem = $(window.kg.defaultGridTemplate());
@@ -413,7 +423,7 @@ window.kg.Aggregate = function (aggEntity, rowFactory) {
     self.isAggRow = true;
     self.offsetLeft = ko.observable((aggEntity.gDepth * 25).toString() + 'px');
     self.aggLabelFilter = aggEntity.aggLabelFilter;
-    self.toggleExpand = function() {
+    self.toggleExpand = function () {
         var c = self.collapsed();
         self.collapsed(!c);
         self.notifyChildren();
@@ -422,7 +432,7 @@ window.kg.Aggregate = function (aggEntity, rowFactory) {
         self.collapsed(state);
         self.notifyChildren();
     };
-    self.notifyChildren = function() {
+    self.notifyChildren = function () {
         $.each(self.aggChildren, function (i, child) {
             child.entity[KG_HIDDEN] = self.collapsed();
             if (self.collapsed()) {
@@ -439,7 +449,7 @@ window.kg.Aggregate = function (aggEntity, rowFactory) {
             if (foundMyself) {
                 var offset = (30 * self.children.length);
                 var c = self.collapsed();
-                agg.offsetTop(c ? agg.offsetTop() - offset : agg.offsetTop() + offset);
+                agg.offsetTop(c ? parseFloat(agg.offsetTop()) - offset : parseFloat(agg.offsetTop()) + offset);
             } else {
                 if (i == self.aggIndex) {
                     foundMyself = true;
@@ -448,10 +458,10 @@ window.kg.Aggregate = function (aggEntity, rowFactory) {
         });
         rowFactory.renderedChange();
     };
-    self.aggClass = ko.computed(function() {
+    self.aggClass = ko.computed(function () {
         return self.collapsed() ? "kgAggArrowCollapsed" : "kgAggArrowExpanded";
     });
-    self.totalChildren = ko.computed(function() {
+    self.totalChildren = ko.computed(function () {
         if (self.aggChildren.length > 0) {
             var i = 0;
             var recurse = function (cur) {
@@ -473,7 +483,7 @@ window.kg.Aggregate = function (aggEntity, rowFactory) {
     self.isEven = ko.observable(false);
     self.isOdd = ko.observable(false);
     self.toggleSelected = function () { return true; };
-}; 
+};
 
 /***********************************************
 * FILE: ..\src\classes\column.js
@@ -1150,7 +1160,7 @@ window.kg.Grid = function (options) {
     self.$canvas = null;
     self.rootDim = self.config.gridDim;
     self.sortInfo = ko.isObservable(self.config.sortInfo) ? self.config.sortInfo : ko.observable(self.config.sortInfo);
-    self.sortedData = self.config.data;
+    self.sortedData = ko.observableArray([]);
     self.lateBindColumns = false;
     self.filteredData = ko.observableArray([]);
     self.lastSortedColumn = undefined;
@@ -1589,6 +1599,7 @@ window.kg.Grid = function (options) {
     });
     //call init
     self.init();
+    self.sortedData = self.config.data;
 };
 
 /***********************************************
@@ -1938,7 +1949,7 @@ window.kg.sortService = {
         } 
         // now lets string check..
         //check if the item data is a valid number
-        if (item.match(/^-?[£$¤]?[\d,.]+%?$/)) {
+        if (item.match(/^-?[¡ê$¡è]?[\d,.]+%?$/)) {
             return window.kg.sortService.sortNumberStr;
         } 
         // check for a date: dd/mm/yyyy or dd/mm/yy

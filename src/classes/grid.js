@@ -74,7 +74,7 @@ window.kg.Grid = function (options) {
     self.$canvas = null;
     self.rootDim = self.config.gridDim;
     self.sortInfo = ko.isObservable(self.config.sortInfo) ? self.config.sortInfo : ko.observable(self.config.sortInfo);
-    self.sortedData = self.config.data;
+    self.sortedData = ko.observableArray([]);
     self.lateBindColumns = false;
     self.filteredData = ko.observableArray([]);
     self.lastSortedColumn = undefined;
@@ -161,6 +161,7 @@ window.kg.Grid = function (options) {
                 var indx = self.config.groups.indexOf(colDef.field);
                 if (indx != -1) {
                     self.configGroups.splice(indx, 0, column);
+                    column.groupIndex(indx + 1);
                 }
             });
             self.columns(cols);
@@ -513,4 +514,5 @@ window.kg.Grid = function (options) {
     });
     //call init
     self.init();
+    self.sortedData = self.config.data;
 };

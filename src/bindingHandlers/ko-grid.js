@@ -1,8 +1,18 @@
 ﻿ko.bindingHandlers['koGrid'] = (function () {
+    var getRootUnvisible = function (elem) {
+        if (elem.parent().is(':visible'))
+            return elem;
+        return getRootUnvisible(elem.parent());
+    }
     return {
         'init': function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
             var options = valueAccessor();
             var elem = $(element);
+            //if ele is unvisible, kogrid cannot get width correctly, so we force show this
+            if (!elem.is(':visible'))
+            {
+                getRootUnvisible(elem).show();
+            }
             options.gridDim = new window.kg.Dimension({ outerHeight: ko.observable(elem.height()), outerWidth: ko.observable(elem.width()) });
             var grid = new window.kg.Grid(options);
             var gridElem = $(window.kg.defaultGridTemplate());
