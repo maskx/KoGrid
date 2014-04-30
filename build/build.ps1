@@ -2,7 +2,7 @@
 $CurrentDir = (Get-Location).Path;
 $OutPutFile = $CurrentDir + "\koGrid.debug.js";
 $TempFile = $OutPutFile + ".temp";
-$FinalFile = "..\koGrid-2.1.1.1.debug.js";
+$FinalFile = "..\koGrid-2.1.1.2.debug.js";
 $BuildOrder = $CurrentDir + "\build-order.txt";
 $commentStart = "<!--";
 $commentEnd = "-->";
@@ -15,7 +15,7 @@ Set-Content $TempFile "/***********************************************";
 Add-Content $TempFile "* koGrid JavaScript Library";
 Add-Content $TempFile "* Authors: https://github.com/ericmbarnard/koGrid/blob/master/README.md";
 Add-Content $TempFile "* Forked :(https://github.com/maskx/KoGrid)";
-Add-Content $TempFile "* Version :2.1.1.1";
+Add-Content $TempFile "* Version :2.1.1.2";
 Add-Content $TempFile "* License: MIT (http://www.opensource.org/licenses/mit-license.php)";
 Add-Content $TempFile "* Compiled At: $compileTime";
 Add-Content $TempFile "***********************************************/`n"

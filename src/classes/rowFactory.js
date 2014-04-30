@@ -166,51 +166,52 @@ window.kg.RowFactory = function (grid) {
         var data = grid.filteredData();
         var maxDepth = groups.length;
         var cols = grid.columns();
-
-        $.each(data, function (i, item) {
-            item[KG_HIDDEN] = true;
-            var ptr = self.groupedData;
-            $.each(groups, function(depth, group) {
-                if (!cols[depth].isAggCol && depth <= maxDepth) {
-                    grid.columns.splice(item.gDepth, 0, new window.kg.Column({
-                        colDef: {
-                            field: '',
-                            width: 25,
-                            sortable: false,
-                            resizable: false,
-                            headerCellTemplate: '<div class="kgAggHeader"></div>'
-                        },
-                        isAggCol: true,
-                        index: item.gDepth,
-                        headerRowHeight: grid.config.headerRowHeight
-                    }));
-                    window.kg.domUtilityService.BuildStyles(grid);
+        if (cols.length > 0) {
+            $.each(data, function (i, item) {
+                item[KG_HIDDEN] = true;
+                var ptr = self.groupedData;
+                $.each(groups, function (depth, group) {
+                    if (!cols[depth].isAggCol && depth <= maxDepth) {
+                        grid.columns.splice(item.gDepth, 0, new window.kg.Column({
+                            colDef: {
+                                field: '',
+                                width: 25,
+                                sortable: false,
+                                resizable: false,
+                                headerCellTemplate: '<div class="kgAggHeader"></div>'
+                            },
+                            isAggCol: true,
+                            index: item.gDepth,
+                            headerRowHeight: grid.config.headerRowHeight
+                        }));
+                        window.kg.domUtilityService.BuildStyles(grid);
+                    }
+                    var col = cols.filter(function (c) { return c.field == group; })[0];
+                    var val = window.kg.utils.evalProperty(item, group);
+                    if (col.cellFilter) {
+                        val = col.cellFilter(val);
+                    }
+                    val = val ? val.toString() : 'null';
+                    if (!ptr[val]) {
+                        ptr[val] = {};
+                    }
+                    if (!ptr[KG_FIELD]) {
+                        ptr[KG_FIELD] = group;
+                    }
+                    if (!ptr[KG_DEPTH]) {
+                        ptr[KG_DEPTH] = depth;
+                    }
+                    if (!ptr[KG_COLUMN]) {
+                        ptr[KG_COLUMN] = col;
+                    }
+                    ptr = ptr[val];
+                });
+                if (!ptr.values) {
+                    ptr.values = [];
                 }
-                var col = cols.filter(function (c) { return c.field == group; })[0];
-                var val = window.kg.utils.evalProperty(item, group);
-                if (col.cellFilter) {
-                    val = col.cellFilter(val);
-                } 
-                val = val ? val.toString() : 'null';
-                if (!ptr[val]) {
-                    ptr[val] = {};
-                }
-                if (!ptr[KG_FIELD]) {
-                    ptr[KG_FIELD] = group;
-                }
-                if (!ptr[KG_DEPTH]) {
-                    ptr[KG_DEPTH] = depth;
-                }
-                if (!ptr[KG_COLUMN]) {
-                    ptr[KG_COLUMN] = col;
-                } 
-                ptr = ptr[val];
+                ptr.values.push(item);
             });
-            if (!ptr.values) {
-                ptr.values = [];
-            }
-            ptr.values.push(item);
-        });
+        }
         grid.fixColumnIndexes();
         self.parsedData.length = 0;
         self.parseGroupData(self.groupedData);
