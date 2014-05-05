@@ -356,6 +356,9 @@ input {
     top: 2px;
     white-space:nowrap;
 }
+.kgColListItem label{
+    display:block;
+}
 .kgColListCheckbox {
     position: relative;
     right: 3px;

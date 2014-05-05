@@ -60,7 +60,7 @@ window.kg.EventProvider = function (grid) {
         // Get the scope from the header container
 		if(groupItem[0].className !='kgRemoveGroup'){
 		    var groupItemScope = ko.dataFor(groupItem[0]);
-			if (groupItemScope) {
+		    if (groupItemScope && groupItemScope.groupIndex) {
 				// set draggable events
 				if(!grid.config.jqueryUIDraggable){
 					groupItem.attr('draggable', 'true');
