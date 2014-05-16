@@ -9,63 +9,63 @@
 /// <reference path="../utils.js"/>
 window.kg.Grid = function (options) {
     var defaults = {
-            rowHeight: 30,
-            columnWidth: 100,
-            headerRowHeight: 30,
-            footerRowHeight: 55,
-            footerVisible: true,			
-            displayFooter: undefined,
-            canSelectRows: true,
-            selectAllState: ko.observable(false),
-            data: ko.observableArray([]),
-            columnDefs: undefined,
-            selectedItems: ko.observableArray([]), // array, if multi turned off will have only one item in array
-            displaySelectionCheckbox: true, //toggles whether row selection check boxes appear
-            selectWithCheckboxOnly: false,
-            useExternalSorting: false,
-            sortInfo: ko.observable(undefined), // similar to filterInfo
-            multiSelect: true,
-            tabIndex: -1,
-            enableColumnResize: true,
-            enableSorting: true,
-            maintainColumnRatios: undefined,
-            beforeSelectionChange: function () { return true;},
-            afterSelectionChange: function () { },
-            columnsChanged: function() { },
-            rowTemplate: undefined,
-            headerRowTemplate: undefined,
-            jqueryUITheme: false,
-            jqueryUIDraggable: false,
-            plugins: [],
-            keepLastSelected: true,
-            groups: [],
-            showGroupPanel: false,
-            enableRowReordering: false,
-            showColumnMenu: true,
-            showFilter: true,
-            disableTextSelection: true,
-            filterOptions: {
-                filterText: ko.observable(""),
-                useExternalFilter: false
-            },
-            //Paging 
-            enablePaging: false,
-            pagingOptions: {
-                pageSizes: ko.observableArray([250, 500, 1000]), //page Sizes
-                pageSize: ko.observable(250), //Size of Paging data
-                totalServerItems: ko.observable(0), //how many items are on the server (for paging)
-                currentPage: ko.observable(1) //what page they are currently on
-            }
+        rowHeight: 30,
+        columnWidth: 100,
+        headerRowHeight: 30,
+        footerRowHeight: 55,
+        footerVisible: true,
+        displayFooter: undefined,
+        canSelectRows: true,
+        selectAllState: ko.observable(false),
+        data: ko.observableArray([]),
+        columnDefs: undefined,
+        selectedItems: ko.observableArray([]), // array, if multi turned off will have only one item in array
+        displaySelectionCheckbox: true, //toggles whether row selection check boxes appear
+        selectWithCheckboxOnly: false,
+        useExternalSorting: false,
+        sortInfo: ko.observable(undefined), // similar to filterInfo
+        multiSelect: true,
+        tabIndex: -1,
+        enableColumnResize: true,
+        enableSorting: true,
+        maintainColumnRatios: undefined,
+        beforeSelectionChange: function () { return true; },
+        afterSelectionChange: function () { return true; },
+        columnsChanged: function () { },
+        rowTemplate: undefined,
+        headerRowTemplate: undefined,
+        jqueryUITheme: false,
+        jqueryUIDraggable: false,
+        plugins: [],
+        keepLastSelected: true,
+        groups: [],
+        showGroupPanel: false,
+        enableRowReordering: false,
+        showColumnMenu: true,
+        showFilter: true,
+        disableTextSelection: true,
+        filterOptions: {
+            filterText: ko.observable(""),
+            useExternalFilter: false
         },
+        //Paging 
+        enablePaging: false,
+        pagingOptions: {
+            pageSizes: ko.observableArray([250, 500, 1000]), //page Sizes
+            pageSize: ko.observable(250), //Size of Paging data
+            totalServerItems: ko.observable(0), //how many items are on the server (for paging)
+            currentPage: ko.observable(1) //what page they are currently on
+        }
+    },
         self = this;
-    
+
     self.maxCanvasHt = ko.observable(0);
     //self vars
     self.config = $.extend(defaults, options);
     self.config.columnDefs = ko.utils.unwrapObservable(options.columnDefs);
     self.gridId = "ng" + window.kg.utils.newId();
     self.$root = null; //this is the root element that is passed in with the binding handler
-	self.$groupPanel = null;
+    self.$groupPanel = null;
     self.$topPanel = null;
     self.$headerContainer = null;
     self.$headerScroller = null;
@@ -81,7 +81,7 @@ window.kg.Grid = function (options) {
     self.showFilter = self.config.showFilter;
     self.filterText = self.config.filterOptions.filterText;
     self.disableTextSelection = ko.observable(self.config.disableTextSelection);
-    self.calcMaxCanvasHeight = function() {
+    self.calcMaxCanvasHeight = function () {
         return (self.configGroups().length > 0) ? (self.rowFactory.parsedData.filter(function (e) {
             return e[KG_HIDDEN] === false;
         }).length * self.config.rowHeight) : (self.filteredData().length * self.config.rowHeight);
@@ -149,10 +149,10 @@ window.kg.Grid = function (options) {
         if (columnDefs.length > 0) {
             $.each(columnDefs, function (i, colDef) {
                 var column = new window.kg.Column({
-                    colDef: colDef, 
-                    index: i, 
+                    colDef: colDef,
+                    index: i,
                     headerRowHeight: self.config.headerRowHeight,
-                    sortCallback: self.sortData, 
+                    sortCallback: self.sortData,
                     resizeOnDataCallback: self.resizeOnData,
                     enableResize: self.config.enableColumnResize,
                     enableSort: self.config.enableSorting
@@ -167,7 +167,7 @@ window.kg.Grid = function (options) {
             self.columns(cols);
         }
     };
-    self.configureColumnWidths = function() {
+    self.configureColumnWidths = function () {
         var cols = self.config.columnDefs;
         var numOfCols = cols.length,
             asterisksArray = [],
@@ -191,13 +191,13 @@ window.kg.Grid = function (options) {
                 if (t == 'auto') { // set it for now until we have data and subscribe when it changes so we can set the width.
                     columns[i].width = columns[i].minWidth;
                     var temp = columns[i];
-                    $(document).ready(function() { self.resizeOnData(temp, true); });
+                    $(document).ready(function () { self.resizeOnData(temp, true); });
                     return;
                 } else if (t.indexOf("*") != -1) {
-                        asteriskNum += t.length;
-                        col.index = i;
-                        asterisksArray.push(col);
-                        return;
+                    asteriskNum += t.length;
+                    col.index = i;
+                    asterisksArray.push(col);
+                    return;
                 } else if (isPercent) { // If the width is a percentage, save it until the very last.
                     col.index = i;
                     percentArray.push(col);
@@ -217,8 +217,8 @@ window.kg.Grid = function (options) {
             // calculate the weight of each asterisk rounded down
             var asteriskVal = Math.floor(remainingWidth / asteriskNum);
             // set the width of each column based on the number of stars
-            $.each(asterisksArray, function (i, col) {				
-				var t = col.width.length;
+            $.each(asterisksArray, function (i, col) {
+                var t = col.width.length;
                 columns[col.index].width = asteriskVal * t;
                 //check if we are on the last column
                 if (col.index + 1 == numOfCols) {
@@ -259,9 +259,9 @@ window.kg.Grid = function (options) {
             }
             var tempArr = [];
             $.each(a, function (i, item) {
-				if(item){
-					tempArr.push(item.field || item);
-				}
+                if (item) {
+                    tempArr.push(item.field || item);
+                }
             });
             self.config.groups = tempArr;
             self.rowFactory.filteredDataChanged();
@@ -269,12 +269,12 @@ window.kg.Grid = function (options) {
         self.filteredData.subscribe(function () {
             if (self.$$selectionPhase) {
                 return;
-            } 
-			self.maxCanvasHt(self.calcMaxCanvasHeight());
-			if (!self.isSorting) {
-			    self.configureColumnWidths();
-			} 
-		});
+            }
+            self.maxCanvasHt(self.calcMaxCanvasHeight());
+            if (!self.isSorting) {
+                self.configureColumnWidths();
+            }
+        });
         self.maxCanvasHt(self.calcMaxCanvasHeight());
         self.searchProvider.evalFilter();
         self.refreshDomSizes();
@@ -291,7 +291,7 @@ window.kg.Grid = function (options) {
         //Have we hit the threshold going up?
         if (self.prevScrollTop > scrollTop && rowIndex > self.prevScrollIndex - SCROLL_THRESHOLD) {
             return;
-        } 
+        }
         self.prevScrollTop = scrollTop;
         self.rowFactory.UpdateViewableRange(new window.kg.Range(Math.max(0, rowIndex - EXCESS_ROWS), rowIndex + self.minRowsToRender() + EXCESS_ROWS));
         self.prevScrollIndex = rowIndex;
@@ -329,7 +329,7 @@ window.kg.Grid = function (options) {
             direction: direction
         });
         self.clearSortingData(col);
-        if(!self.config.useExternalSorting){
+        if (!self.config.useExternalSorting) {
             window.kg.sortService.Sort(self.sortInfo.peek(), self.sortedData);
         } else {
             self.config.sortInfo(self.sortInfo.peek());
@@ -358,19 +358,19 @@ window.kg.Grid = function (options) {
     //self vars
     self.elementsNeedMeasuring = true;
     self.columns = ko.observableArray([]);
-    self.columns.subscribe(function(newCols) {
+    self.columns.subscribe(function (newCols) {
         self.config.columnsChanged(newCols);
     });
     self.renderedRows = ko.observableArray([]);
     self.headerRow = null;
     self.rowHeight = self.config.rowHeight;
-	self.jqueryUITheme = ko.observable(self.config.jqueryUITheme);
+    self.jqueryUITheme = ko.observable(self.config.jqueryUITheme);
     self.footer = null;
     self.selectedItems = self.config.selectedItems;
     self.multiSelect = self.config.multiSelect;
     self.footerVisible = window.kg.utils.isNullOrUndefined(self.config.displayFooter) ? self.config.footerVisible : self.config.displayFooter;
     self.config.footerRowHeight = self.footerVisible ? self.config.footerRowHeight : 0;
-	self.showColumnMenu = self.config.showColumnMenu;
+    self.showColumnMenu = self.config.showColumnMenu;
     self.showMenu = ko.observable(false);
     self.configGroups = ko.observableArray([]);
 
@@ -412,46 +412,46 @@ window.kg.Grid = function (options) {
     self.totalFilteredItemsLength = ko.computed(function () {
         return self.filteredData().length;
     });
-	self.showGroupPanel = ko.computed(function(){
-		return self.config.showGroupPanel;
-	});
-	self.topPanelHeight = ko.observable(self.config.showGroupPanel === true ? (self.config.headerRowHeight * 2) : self.config.headerRowHeight);
-	self.viewportDimHeight = ko.computed(function () {
+    self.showGroupPanel = ko.computed(function () {
+        return self.config.showGroupPanel;
+    });
+    self.topPanelHeight = ko.observable(self.config.showGroupPanel === true ? (self.config.headerRowHeight * 2) : self.config.headerRowHeight);
+    self.viewportDimHeight = ko.computed(function () {
         return Math.max(0, self.rootDim.outerHeight() - self.topPanelHeight() - self.config.footerRowHeight - 2);
     });
-	self.groupBy = function (col) {
-	    if (self.sortedData().length < 1) {
-	        return;
-	    }
+    self.groupBy = function (col) {
+        if (self.sortedData().length < 1) {
+            return;
+        }
         var indx = self.configGroups().indexOf(col);
         if (indx == -1) {
-			col.isGroupedBy(true);
+            col.isGroupedBy(true);
             self.configGroups.push(col);
-			col.groupIndex(self.configGroups().length);
+            col.groupIndex(self.configGroups().length);
         } else {
-			self.removeGroup(indx);
+            self.removeGroup(indx);
         }
         window.kg.domUtilityService.BuildStyles(self);
     };
-    self.removeGroup = function(index) {
-		var col = self.columns().filter(function(item){ 
-			return item.groupIndex() == (index + 1);
-		})[0];
-		col.isGroupedBy(false);
-		col.groupIndex(0);
+    self.removeGroup = function (index) {
+        var col = self.columns().filter(function (item) {
+            return item.groupIndex() == (index + 1);
+        })[0];
+        col.isGroupedBy(false);
+        col.groupIndex(0);
         self.columns.splice(index, 1);
         self.configGroups.splice(index, 1);
-		self.fixGroupIndexes();
+        self.fixGroupIndexes();
         if (self.configGroups().length === 0) {
             self.fixColumnIndexes();
         }
         window.kg.domUtilityService.BuildStyles(self);
     };
-	self.fixGroupIndexes = function(){		
-		$.each(self.configGroups(), function(i,item){
-			item.groupIndex(i + 1);
-		});
-	};
+    self.fixGroupIndexes = function () {
+        $.each(self.configGroups(), function (i, item) {
+            item.groupIndex(i + 1);
+        });
+    };
     self.totalRowWidth = function () {
         var totalWidth = 0,
             cols = self.visibleColumns();
@@ -514,5 +514,5 @@ window.kg.Grid = function (options) {
     });
     //call init
     self.init();
-    
+
 };
